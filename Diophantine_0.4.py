@@ -2,7 +2,7 @@ from functools import reduce
 import time
 
 start = time.time()
-input_name = "input40x61(10x30).txt"
+input_name = "input.txt"
 
 
 def GCD(a, b):  # It takes too long!
@@ -41,7 +41,6 @@ def redundant(ar):
     """
     delete redundant vectors
     """
-    iis = range(len(ar[0]))
     jjs = range(len(ar))
     decar = []  # array of decimal representations converted from binaries
     for y in ar:
@@ -53,10 +52,14 @@ def redundant(ar):
                 binstr = binstr + '0'
         decar.append(int(binstr, 2))
     for j in jjs:
+        r = True  # do we need ar[j]
         for k in jjs:
             an = decar[j] & decar[k]
-            if an == decar[j]:
-
+            if an == decar[k] and j != k:
+                r = False
+                break
+        if r:
+            ar2.append(ar[j])
     return ar2
 
 
