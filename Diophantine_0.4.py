@@ -2,7 +2,7 @@ from functools import reduce
 import time
 
 start = time.time()
-input_name = "input25x41.txt"
+input_name = "input40x61(10x30).txt"
 
 
 def GCD(a, b):  # It takes too long!
@@ -44,19 +44,19 @@ def redundant(ar):
     iis = range(len(ar[0]))
     for y in ar:
         r2 = True  # do we need y
-        for k in ar:
-            # y!=k:
-            r = True  # is y redundant comparing to k
-            for i in iis:
-                if y[i]==0 and k[i]!=0:  # k[i] == 0 and y[i] != 0:
-                    r = False
-                    break
-            if r and y != k:
-                # ar2.remove(k)  # ar2.remove(y)
-                r2 = False
-                break
-        if r2:
-            ar2.append(y)
+        # for k in ar:
+        #     # y!=k:
+        #     r = True  # is y redundant comparing to k
+        #     for i in iis:
+        #         if y[i]==0 and k[i]!=0:  # k[i] == 0 and y[i] != 0:
+        #             r = False
+        #             break
+        #     if r and y != k:
+        #         # ar2.remove(k)  # ar2.remove(y)
+        #         r2 = False
+        #         break
+        # if r2:
+        #     ar2.append(y)
     return ar2
 
 
