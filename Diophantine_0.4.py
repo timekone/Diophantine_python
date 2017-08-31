@@ -42,21 +42,21 @@ def redundant(ar):
     delete redundant vectors
     """
     iis = range(len(ar[0]))
+    jjs = range(len(ar))
+    decar = []  # array of decimal representations converted from binaries
     for y in ar:
-        r2 = True  # do we need y
-        # for k in ar:
-        #     # y!=k:
-        #     r = True  # is y redundant comparing to k
-        #     for i in iis:
-        #         if y[i]==0 and k[i]!=0:  # k[i] == 0 and y[i] != 0:
-        #             r = False
-        #             break
-        #     if r and y != k:
-        #         # ar2.remove(k)  # ar2.remove(y)
-        #         r2 = False
-        #         break
-        # if r2:
-        #     ar2.append(y)
+        binstr = ''  # binary representation of vector
+        for c in y:
+            if c != 0:
+                binstr = binstr + '1'
+            else:
+                binstr = binstr + '0'
+        decar.append(int(binstr, 2))
+    for j in jjs:
+        for k in jjs:
+            an = decar[j] & decar[k]
+            if an == decar[j]:
+
     return ar2
 
 
