@@ -54,10 +54,11 @@ def redundant(ar):
     for j in jjs:
         r = True  # do we need ar[j]
         for k in jjs:
-            an = decar[j] & decar[k]
-            if an == decar[k] and j != k:
-                r = False
-                break
+            if j!=k:
+                an = decar[j] & decar[k]
+                if an == decar[k]:
+                    r = False
+                    break
         if r:
             ar2.append(ar[j])
     return ar2
