@@ -1,8 +1,8 @@
 from functools import reduce
-import time
+import time, datetime
 
 start = time.time()
-input_name = "input.txt"
+input_name = "generated.txt"
 
 
 def GCD(a, b):  # It takes too long!
@@ -67,11 +67,10 @@ def redundant(ar):
 def redundant2(ar):
     ar2 = []
     strings = []
-    iis = range(len(ar[0]))
     for j in range(len(ar)):
         zcounter = 0
         s = ''
-        for i in iis:
+        for i in range(len(ar[0])):
             if ar[j][i] == 0:
                 zcounter += 1
                 s = s + '0'
@@ -152,8 +151,8 @@ for i in range(len(input_arr)):
     for j in range(i+1, len(input_arr)):
         if input_arr[j][i] != 0:
             input_arr[j] = list(map(lambda x, y: x * input_arr[i][i] - y * input_arr[j][i], input_arr[j], input_arr[i]))
+    input_arr = simplify(input_arr)
 
-input_arr = simplify(input_arr)
 f_arr = Min_m(input_arr)  # choosing equation with min m
 input_arr.remove(f_arr)
 #print(cur_eq)
@@ -239,8 +238,9 @@ while len(input_arr) > 0:
 
 end = time.time()
 
-with open("output.txt", "w") as output_file:
+with open("output.txt", "a") as output_file:
+    output_file.write('============================[ ' + str(datetime.datetime.today()) + ' ]====================================\n')
+    output_file.write(str(end-start) + '\n')
     for xv in x2:
         output_file.write(str(xv)+'\n')
-    output_file.write(str(end-start))
 print(x2)
