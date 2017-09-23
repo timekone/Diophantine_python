@@ -1,8 +1,8 @@
 from functools import reduce
-import time
+import time, datetime
 
 start = time.time()
-input_name = "input25x41.txt"
+input_name = "input.txt"
 
 
 def GCD(a, b):  # It takes too long!
@@ -36,54 +36,50 @@ def Min_m(arr):
     return arr[m_arr.index(min(m_arr))]
 
 
-def redundant(ar):
-    ar2 = []  # = list(ar)
+def redundant2(ar):
     """
     delete redundant vectors
     """
-    iis = range(len(ar[0]))
-    for y in ar:
-        r2 = True  # do we need y
-        for k in ar:
-            # y!=k:
-            r = True  # is y redundant comparing to k
-            for i in iis:
-                if y[i]==0 and k[i]!=0:  # k[i] == 0 and y[i] != 0:
-                    r = False
-                    break
-            if r and y != k:
-                # ar2.remove(k)  # ar2.remove(y)
-                r2 = False
-                break
-        if r2:
-            ar2.append(y)
-    return ar2
-
-
-def redundant2(ar):
     ar2 = []
     strings = []
-    iis = range(len(ar[0]))
     for j in range(len(ar)):
-        zcounter = 0
-        s = ''
-        for i in iis:
+        zerocounter = 0
+        binstr = ''
+        for i in range(len(ar[0])):
             if ar[j][i] == 0:
-                zcounter += 1
-                s = s + '0'
+                zerocounter += 1
+                binstr = binstr + '0'
             else:
-                s = s + '1'
-        if zcounter > len(input_arr):
+                binstr = binstr + '1'
+        if zerocounter > len(input_arr):
             ar2.append(ar[j])
-            strings.append(s)
-    #return ar2
+            strings.append(binstr)
     ar3 = []
     strings2 = []
     for j in range(len(ar2)):
         if strings[j] not in strings2:
             ar3.append(ar2[j])
             strings2.append(strings[j])
-    return ar3
+
+    """
+    redundant with bool optimisation(old redundant)
+    """
+    decar = []
+    for binstr in strings2:
+        decar.append(int(binstr, 2))
+    ar2 = []  # reusing ar2 to save memory
+    jjs = range(len(ar3))
+    for j in jjs:
+        r = True  # do we need ar[j]
+        for k in jjs:
+            if j != k:
+                an = decar[j] & decar[k]
+                if an == decar[k]:
+                    r = False
+                    break
+        if r:
+            ar2.append(ar3[j])
+    return ar2
 
 
 def simplify(ar):
@@ -148,8 +144,8 @@ for i in range(len(input_arr)):
     for j in range(i+1, len(input_arr)):
         if input_arr[j][i] != 0:
             input_arr[j] = list(map(lambda x, y: x * input_arr[i][i] - y * input_arr[j][i], input_arr[j], input_arr[i]))
+    input_arr = simplify(input_arr)
 
-input_arr = simplify(input_arr)
 f_arr = Min_m(input_arr)  # choosing equation with min m
 input_arr.remove(f_arr)
 #print(cur_eq)
@@ -221,22 +217,18 @@ while len(input_arr) > 0:
                     l2 = list(map(lambda t: t*cur_eq2[j], x[i]))
                     y = list(map(lambda a1, a2: a1+a2, l1, l2))
                     x2.append(y)
-    print(len(x2))
-    print('start r2')
+    print('start r2: ' + str(len(x2)))
     x2 = redundant2(x2)
-    print(len(x2))
-    print('start r')
-    x2 = redundant(x2)
-    print('finish r')
-    print(len(x2))
+    print('finish r2: ' + str(len(x2)))
     x2 = simplify(x2)
     #print(x2)
     x = x2
 
 end = time.time()
 
-with open("output.txt", "w") as output_file:
+with open("output.txt", "a") as output_file:
+    output_file.write('============================[ ' + str(datetime.datetime.today()) + ' ]====================================\n')
+    output_file.write(str(end-start) + '\n')
     for xv in x2:
         output_file.write(str(xv)+'\n')
-    output_file.write(str(end-start))
 print(x2)
