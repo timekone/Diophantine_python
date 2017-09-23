@@ -2,7 +2,7 @@ from functools import reduce
 import time, datetime
 
 start = time.time()
-input_name = "generated.txt"
+input_name = "input.txt"
 
 
 def GCD(a, b):  # It takes too long!
@@ -36,57 +36,50 @@ def Min_m(arr):
     return arr[m_arr.index(min(m_arr))]
 
 
-def redundant(ar):
-    ar2 = []  # = list(ar)
+def redundant2(ar):
     """
     delete redundant vectors
     """
-    jjs = range(len(ar))
-    decar = []  # array of decimal representations converted from binaries
-    for y in ar:
-        binstr = ''  # binary representation of vector
-        for c in y:
-            if c != 0:
-                binstr = binstr + '1'
-            else:
-                binstr = binstr + '0'
-        decar.append(int(binstr, 2))
-    for j in jjs:
-        r = True  # do we need ar[j]
-        for k in jjs:
-            if j!=k:
-                an = decar[j] & decar[k]
-                if an == decar[k]:
-                    r = False
-                    break
-        if r:
-            ar2.append(ar[j])
-    return ar2
-
-
-def redundant2(ar):
     ar2 = []
     strings = []
     for j in range(len(ar)):
-        zcounter = 0
-        s = ''
+        zerocounter = 0
+        binstr = ''
         for i in range(len(ar[0])):
             if ar[j][i] == 0:
-                zcounter += 1
-                s = s + '0'
+                zerocounter += 1
+                binstr = binstr + '0'
             else:
-                s = s + '1'
-        if zcounter > len(input_arr):
+                binstr = binstr + '1'
+        if zerocounter > len(input_arr):
             ar2.append(ar[j])
-            strings.append(s)
-    #return ar2
+            strings.append(binstr)
     ar3 = []
     strings2 = []
     for j in range(len(ar2)):
         if strings[j] not in strings2:
             ar3.append(ar2[j])
             strings2.append(strings[j])
-    return ar3
+
+    """
+    redundant with bool optimisation(old redundant)
+    """
+    decar = []
+    for binstr in strings2:
+        decar.append(int(binstr, 2))
+    ar2 = []  # reusing ar2 to save memory
+    jjs = range(len(ar3))
+    for j in jjs:
+        r = True  # do we need ar[j]
+        for k in jjs:
+            if j != k:
+                an = decar[j] & decar[k]
+                if an == decar[k]:
+                    r = False
+                    break
+        if r:
+            ar2.append(ar3[j])
+    return ar2
 
 
 def simplify(ar):
@@ -224,14 +217,9 @@ while len(input_arr) > 0:
                     l2 = list(map(lambda t: t*cur_eq2[j], x[i]))
                     y = list(map(lambda a1, a2: a1+a2, l1, l2))
                     x2.append(y)
-    print(len(x2))
-    print('start r2')
+    print('start r2: ' + str(len(x2)))
     x2 = redundant2(x2)
-    print(len(x2))
-    print('start r')
-    x2 = redundant(x2)
-    print('finish r')
-    print(len(x2))
+    print('finish r2: ' + str(len(x2)))
     x2 = simplify(x2)
     #print(x2)
     x = x2
