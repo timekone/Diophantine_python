@@ -37,7 +37,7 @@ def Min_m(arr):
     return arr[m_arr.index(min(m_arr))]
 
 
-def redundant2(ar):
+def redundant2(ar, input_len):
     """
     delete redundant vectors
     """
@@ -52,7 +52,7 @@ def redundant2(ar):
                 binstr = binstr + '0'
             else:
                 binstr = binstr + '1'
-        if zerocounter > len(input_arr):
+        if zerocounter > input_len:
             ar2.append(ar[j])
             strings.append(binstr)
     ar3 = []
@@ -65,17 +65,17 @@ def redundant2(ar):
     """
     redundant with bool optimisation(old redundant)
     """
-    decar = []
+    decimal_ar = []
     for binstr in strings2:
-        decar.append(int(binstr, 2))
+        decimal_ar.append(int(binstr, 2))
     ar2 = []  # reusing ar2 to save memory
     jjs = range(len(ar3))
     for j in jjs:
         r = True  # do we need ar[j]
         for k in jjs:
             if j != k:
-                an = decar[j] & decar[k]
-                if an == decar[k]:
+                an = decimal_ar[j] & decimal_ar[k]
+                if an == decimal_ar[k]:
                     r = False
                     break
         if r:
@@ -194,7 +194,7 @@ def work(input_arr):
                         y = list(map(lambda a1, a2: a1 + a2, l1, l2))
                         x2.append(y)
         print('start r2: ' + str(len(x2)))
-        x2 = redundant2(x2)
+        x2 = redundant2(x2, len(input_arr))
         print('finish r2: ' + str(len(x2)))
         x2 = simplify(x2)
         # print(x2)
