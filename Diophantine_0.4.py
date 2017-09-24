@@ -1,5 +1,6 @@
 from functools import reduce
-import time, datetime
+import time
+import datetime
 
 start = time.time()
 input_name = "input.txt"
@@ -103,6 +104,104 @@ def set_basis(arr):
                 basis[p].append(0)
     return basis
 
+
+def work(input_arr):
+    for i in range(len(input_arr)):
+        """
+        diagonalize input matrix
+        """
+        if input_arr[i][i] == 0:
+            t = 0
+            while i + t + 1 < len(input_arr) and input_arr[i + t][i] == 0:
+                t += 1
+            c = input_arr[i]
+            input_arr[i] = input_arr[i + t]
+            input_arr[i + t] = c
+            if input_arr[i][i] == 0:
+                break
+        for j in range(0, i):
+            if input_arr[j][i] != 0:
+                input_arr[j] = list(
+                    map(lambda x, y: x * input_arr[i][i] - y * input_arr[j][i], input_arr[j], input_arr[i]))
+        for j in range(i + 1, len(input_arr)):
+            if input_arr[j][i] != 0:
+                input_arr[j] = list(
+                    map(lambda x, y: x * input_arr[i][i] - y * input_arr[j][i], input_arr[j], input_arr[i]))
+        input_arr = simplify(input_arr)
+    f_arr = Min_m(input_arr)  # choosing equation with min m
+    input_arr.remove(f_arr)
+    # print(cur_eq)
+    basis = set_basis(f_arr)  # setting canon basis for given equation
+    """[[1, 0, 0, 0, 0], #basis = x
+             [0, 1, 0, 0, 0],
+             [0, 0, 1, 0, 0],
+             [0, 0, 0, 1, 0],
+             [0, 0, 0, 0, 1],]
+
+    basis = [[1, 0, 0, 0, 0, 0], #basis = x
+             [0, 1, 0, 0, 0, 0],
+             [0, 0, 1, 0, 0, 0],
+             [0, 0, 0, 1, 0, 0],
+             [0, 0, 0, 0, 1, 0],
+             [0, 0, 0, 0, 0, 1],]
+             """
+    # f_arr = []
+    # for e in range(len(basis)):            # appends value of equation with substituted basis
+    #    f_arr.append(basis[e][e]*cur_eq[e])  # TODO maybe just cur_eq[e], since basis[e][e] always 1?
+    # TODO check if not all zeroes, positive or negative only
+    x = []
+    # print(str(f_arr)+'\n')
+    """
+    if value of eq is zero, add corresponding basis vector to answer
+    otherwise for every pair of ei and ej, add y = -L(ei)*ej + L(ej)*ei, where ej - basis for which L>0, ei - for which L<0
+    """
+    for i in range(len(f_arr)):
+        if f_arr[i] == 0:
+            x.append(basis[i])
+        elif f_arr[i] < 0:
+            for j in range(len(f_arr)):
+                if f_arr[j] > 0:
+                    l1 = list(map(lambda x: x * -f_arr[i], basis[j]))
+                    l2 = list(map(lambda x: x * f_arr[j], basis[i]))
+                    y = list(map(lambda a1, a2: a1 + a2, l1, l2))
+                    d = reduce(GCD, y)  # find greatest common divider of vector..
+                    if d != 1:  # and if it is not 1..
+                        y = list(map(lambda x: x // d, y))  # simplify vector
+                    x.append(y)
+    # print(x)
+    while len(input_arr) > 0:
+        f_arr = []
+        for e in input_arr:  # for each equation left..
+            fn = []
+            for xn in x:  # substitute every answer vector
+                fx = 0
+                for a in range(len(xn)):
+                    fx += xn[a] * e[a]
+                fn.append(fx)
+            f_arr.append(fn)
+        cur_eq2 = Min_m(f_arr)
+        input_arr.__delitem__(f_arr.index(cur_eq2))
+        print('{0} {1}'.format(len(cur_eq2), len(input_arr)))
+        x2 = []
+        for i in range(len(cur_eq2)):
+            if cur_eq2[i] == 0:
+                x2.append(x[i])
+            elif cur_eq2[i] < 0:
+                for j in range(len(cur_eq2)):
+                    if cur_eq2[j] > 0:
+                        l1 = list(map(lambda t: t * -cur_eq2[i], x[j]))
+                        l2 = list(map(lambda t: t * cur_eq2[j], x[i]))
+                        y = list(map(lambda a1, a2: a1 + a2, l1, l2))
+                        x2.append(y)
+        print('start r2: ' + str(len(x2)))
+        x2 = redundant2(x2)
+        print('finish r2: ' + str(len(x2)))
+        x2 = simplify(x2)
+        # print(x2)
+        x = x2
+    return x
+
+
 """"
 input_arr = [[4, 2, -3, -2, -1], gd
              [2, -1, -4, 1, 5],
@@ -125,104 +224,7 @@ with open(input_name) as input_file:
             int_l.append(int(ch))
         input_arr.append(int_l)
 
-for i in range(len(input_arr)):
-    """
-    diagonilize input matrix
-    """
-    if input_arr[i][i] == 0:
-        t = 0
-        while i+t+1 < len(input_arr) and input_arr[i+t][i] == 0:
-            t += 1
-        c = input_arr[i]
-        input_arr[i] = input_arr[i + t]
-        input_arr[i + t] = c
-        if input_arr[i][i] == 0:
-            break
-    for j in range(0, i):
-        if input_arr[j][i] != 0:
-            input_arr[j] = list(map(lambda x, y: x * input_arr[i][i] - y * input_arr[j][i], input_arr[j], input_arr[i]))
-    for j in range(i+1, len(input_arr)):
-        if input_arr[j][i] != 0:
-            input_arr[j] = list(map(lambda x, y: x * input_arr[i][i] - y * input_arr[j][i], input_arr[j], input_arr[i]))
-    input_arr = simplify(input_arr)
-
-f_arr = Min_m(input_arr)  # choosing equation with min m
-input_arr.remove(f_arr)
-#print(cur_eq)
-
-basis = set_basis(f_arr)  # setting canon basis for given equation
-"""[[1, 0, 0, 0, 0], #basis = x
-         [0, 1, 0, 0, 0],
-         [0, 0, 1, 0, 0],
-         [0, 0, 0, 1, 0],
-         [0, 0, 0, 0, 1],]
-
-basis = [[1, 0, 0, 0, 0, 0], #basis = x
-         [0, 1, 0, 0, 0, 0],
-         [0, 0, 1, 0, 0, 0],
-         [0, 0, 0, 1, 0, 0],
-         [0, 0, 0, 0, 1, 0],
-         [0, 0, 0, 0, 0, 1],]
-         """
-#f_arr = []
-#for e in range(len(basis)):            # appends value of equation with substituted basis
-#    f_arr.append(basis[e][e]*cur_eq[e])  # TODO maybe just cur_eq[e], since basis[e][e] always 1?
-
-# TODO check if not all zeroes, positive or negative only
-
-x = []
-#print(str(f_arr)+'\n')
-
-
-"""
-if value of eq is zero, add corresponding basis vector to answer
-otherwise for every pair of ei and ej, add y = -L(ei)*ej + L(ej)*ei, where ej - basis for which L>0, ei - for which L<0
-"""
-for i in range(len(f_arr)):
-    if f_arr[i] == 0:
-        x.append(basis[i])
-    elif f_arr[i] < 0:
-        for j in range(len(f_arr)):
-            if f_arr[j] > 0:
-                l1 = list(map(lambda x: x*-f_arr[i], basis[j]))
-                l2 = list(map(lambda x: x*f_arr[j], basis[i]))
-                y = list(map(lambda a1, a2: a1+a2, l1, l2))
-                d = reduce(GCD, y)  # find greatest common divider of vector..
-                if d != 1:  # and if it is not 1..
-                    y = list(map(lambda x: x//d, y))  # simplify vector
-                x.append(y)
-#print(x)
-
-while len(input_arr) > 0:
-    f_arr = []
-    for e in input_arr:  # for each equation left..
-        fn = []
-        for xn in x:  # substitute every answer vector
-            fx = 0
-            for a in range(len(xn)):
-                fx += xn[a]*e[a]
-            fn.append(fx)
-        f_arr.append(fn)
-    cur_eq2 = Min_m(f_arr)
-    input_arr.__delitem__(f_arr.index(cur_eq2))
-    print('{0} {1}'.format(len(cur_eq2),len(input_arr)))
-    x2 = []
-    for i in range(len(cur_eq2)):
-        if cur_eq2[i] == 0:
-            x2.append(x[i])
-        elif cur_eq2[i] < 0:
-            for j in range(len(cur_eq2)):
-                if cur_eq2[j] > 0:
-                    l1 = list(map(lambda t: t * -cur_eq2[i], x[j]))
-                    l2 = list(map(lambda t: t*cur_eq2[j], x[i]))
-                    y = list(map(lambda a1, a2: a1+a2, l1, l2))
-                    x2.append(y)
-    print('start r2: ' + str(len(x2)))
-    x2 = redundant2(x2)
-    print('finish r2: ' + str(len(x2)))
-    x2 = simplify(x2)
-    #print(x2)
-    x = x2
+x2 = work(input_arr)
 
 end = time.time()
 
